@@ -1,0 +1,85 @@
+#! /bin/sh
+# -*- mode: sh -*-
+#
+
+KEY="1234124"
+
+res1=$(mktemp --tmpdir iface1.XXXXXXXX)
+res2=$(mktemp --tmpdir iface2.XXXXXXXX)
+#res_adevices=$(mktemp --tmpdir iface3.XXXXXXXX)
+
+conf_file="${XDG_CONFIG_HOME:-$HOME/.config}/gCroc/gCroc.conf"
+
+mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/gCroc"
+touch "$conf_file"
+
+# ___ section 2 - load conf file
+PARSER='
+BEGIN { FS="="; OFS="\n"; }
+/^debug/ {printf "DEBUG=%s\n", $2}
+/^default_yes/ {printf "DEFAULT_YES=%s\n", $2}
+/^overwrite/ {printf "OVERWRITE=%s\n", $2}
+/^out/ {printf "OUT=%s\n", $2}
+/^curve_value/ {printf "CURVE_VALUE=%s\n", $2}
+/^ip/ {printf "IP=%s\n", $2}
+/^relay_ip/ {printf "RELAY_IP=%s\n", $2}
+/^relay_ip6/ {printf "RELAY_IP6=%s\n", $2}
+/^use_local/ {printf "USE_LOCAL=%s\n", $2}
+/^local_dns/ {printf "LOCAl_DNS=%s\n", $2}
+/^compress/ {printf "COMPRESS=%s\n", $2}
+'
+eval $(sed -r "s/[ \t]*=[ \t]*/=/" $conf_file | awk "$PARSER")
+
+# ___ section 3 - set up LISTS
+
+# ___ section 4 - show GUI
+
+# Global tab
+yad --plug=$KEY --tabnum=1 --form --separator='\n' --quoted-output \
+    --field="Debug:CHK" "$DEBUG" \
+    --field="Yes to Prompts:CHK" "$DEFAULT_YES" \
+    --field="Overwrite:CHK" "$OVERWRITE"  \
+    --field="What to Send:dir" "$OUT" \
+    --field="Curve Value" "$CUVE_VALUE" >$res1 &
+
+# Network tab
+yad --plug=$KEY --tabnum=2 --form --separator='\n' --quoted-output \
+    --field="Manually Set IP" "$ip" \
+    --field="Relay IP" "$RELAY_IP" \
+    --field="Relay IP6" "$RELAY_IP6" \
+    --field="only local connections::dir" "$USE_LOCAL" \
+    --field="Use built-in DNS stub resolver:chk" "$LOCAL_DNS"  \
+    --field="Compress Sending:CHK" "$COMPRESS" > $res2 &
+
+# main UI
+yad --notebook --key=$KEY --tab="Global" --tab="Network" \
+    --title="gCroc gCroc Send-To" \
+    --window-icon="/usr/share/gCroc/icons/gCroc.png" \
+    --image=gtk-execute \
+    --width=400 --image-on-top --text="gCroc Send-To"
+
+# ___ section 5 - recreate rc file
+if [[ $? -eq 0 ]]; then
+    echo -e "\n# This file is updated automatically by gCroc \n" > $conf_file
+    eval TAB1=($(< $res1))
+    eval TAB2=($(< $res2))
+
+    echo "path_dl = \"${TAB1[0]}\"" >> $conf_file
+    [[ ${TAB1[1]} != Default ]] && echo "audio_device_desktop = \"${TAB1[1]}\"" >> $conf_file
+    [[ ${TAB1[2]} != Default ]] && echo "audio_device_webcam = \"${TAB1[2]}\"" >> $conf_file
+    echo >> $conf_file
+
+    echo "key_twitch = \"${TAB2[0]}\"" >> $conf_file
+    echo "key_ustream = \"${TAB2[1]}\"" >> $conf_file
+    echo "key_youtube = \"${TAB2[2]}\"" >> $conf_file
+    echo "conn_rtp = \"${TAB2[3]}\"" >> $conf_file
+    echo "conn_ffserver = \"${TAB2[3]}\"" >> $conf_file
+    echo >> $conf_file
+
+    echo "meta_title = \"${TAB3[0]}\"" >> $conf_file
+    echo "overlay_text = \"${TAB3[1]}\"" >> $conf_file
+    echo >> $conf_file
+fi
+
+# cleanup
+rm -f $res1 $res2

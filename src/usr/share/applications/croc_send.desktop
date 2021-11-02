@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=File Transfer Direct N2N- Croc Sender
+GenericName=File Transfer Direct - Croc
+Comment=File Transfer Direct - Croc
+Exec=rxvt -hold -title "Croc Send" -sr -si -sw +j +ss  -fn "xft:DejaVuSansMono:pixelsize=10" -background black -foreground white -geometry 80x20 -e croc_send
+Terminal=true
+Icon=gcroc.png
+Type=Application
+Categories=P2P

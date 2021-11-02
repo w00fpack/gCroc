@@ -1,0 +1,25 @@
+#! /bin/sh
+# -*- mode: sh -*-
+#
+
+KEY="1234124"
+
+res1=$(mktemp --tmpdir iface1.XXXXXXXX)
+
+conf_file="${XDG_CONFIG_HOME:-$HOME/.config}/gCroc/gCroc.conf"
+
+mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/gCroc"
+touch "$conf_file"
+
+# ___ section 4 - show GUI
+yad \
+    --title="gCroc gCroc Receive" \
+    --window-icon="/usr/share/pixmaps/gcroc.png" \
+	--form --separator='\n' --quoted-output \
+     --field="Receive words gotten by sender" "$CUVE_VALUE" \
+     --field="Log" "$CUVE_VALUE" \
+    --image=gtk-execute \
+    --width=400 --image-on-top --text="gCroc Send-To" \
+     >$res1 &
+
+# cleanup

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=File Transfer Direct N2N- Croc GUI
+GenericName=File Transfer Direct - Croc
+Comment=File Transfer Direct - Croc
+Exec=/usr/share/gCroc/gCroc
+Terminal=true
+Icon=gcroc.png
+Type=Application
+Categories=P2P

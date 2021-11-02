@@ -1,0 +1,17 @@
+#! /bin/sh
+# -*- mode: sh -*-
+#
+
+KEY="1234124"
+
+# ___ show GUI
+yad \
+    --title="gCroc gCroc Send-To" \
+    --window-icon="/usr/share/pixmaps/gcroc.png" \
+	--form --separator='\n'  \
+	--quoted-output \
+    --field="Receive:BTN" "$DEFAULT_YES" \
+    --field="Send:BTN" "$DEFAULT_YES" \
+    -image=gtk-execute \
+    --width=400 --image-on-top --text="gCroc Send-To"
+# cleanup

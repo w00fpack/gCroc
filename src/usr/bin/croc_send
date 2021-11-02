@@ -1,0 +1,17 @@
+#!/bin/bash
+#
+# Croc download - https://github.com/schollz/croc/releases/latest/
+
+filename=$*
+
+if [ "$*" == "" ]; then
+	echo "What is a directory, or filename(s) with path(s) to send?"
+	read filename
+fi
+
+if [ "$filename" == "" ]; then
+	echo "No filename(s) or directory was input.  Exiting"
+	exit
+fi
+
+croc send $filename
